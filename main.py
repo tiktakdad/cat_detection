@@ -85,6 +85,7 @@ def detection_cat(model):
         now = time.localtime()
         n_time = "%02d:%02d:%02d" % (now.tm_hour, now.tm_min, now.tm_sec)
 
+
         bboxes = []
         confidences = []
         class_ids = []
