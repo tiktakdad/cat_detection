@@ -75,7 +75,7 @@ def detection_cat(model, source):
             ret, frame = capture.read()
             if not ret:
                 break
-            pbar.update(1)
+            pbar.update()
 
             origin = frame.copy()
             if stack_frame is None:
@@ -195,12 +195,15 @@ def detection_cat(model, source):
             if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
                 break
 
+        pbar.update(frame_count - pbar.n)
+        pbar.close()
+
     # final output
-    pbar.close()
     heat_map_save = draw_heatmap(heat_map, stack_frame)
     cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
     #cv2.imshow("heatmap", heat_map_save)
     capture.release()
+    print('Finish Cat Day!')
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
