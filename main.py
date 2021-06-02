@@ -1,3 +1,5 @@
+import argparse
+
 import torch
 import numpy as np
 import time
@@ -23,7 +25,7 @@ def expand_box(bbox, roi_mul, shape):
     new_box = [cx - int(width / 2), cy - int(height / 2), width, height]
     return new_box
 
-def detection_cat(model):
+def detection_cat(model, source):
     # capture the webcam
     roi_mul = 1.2
     stacked_box = []
@@ -32,7 +34,8 @@ def detection_cat(model):
     head_id = {}
 
     # capture = cv2.VideoCapture(0)
-    capture = cv2.VideoCapture('D:/Videos/tiki_taka/210601/[mix]TV_CAM_장치_20210601_003220.mp4')
+    #capture = cv2.VideoCapture('D:/Videos/tiki_taka/210601/[mix]TV_CAM_장치_20210601_003220.mp4')
+    capture = cv2.VideoCapture(source)
 
     if not capture.isOpened():
         print('failed capture.isOpened()')
@@ -40,7 +43,8 @@ def detection_cat(model):
 
 
 
-    capture.set(cv2.CAP_PROP_POS_FRAMES, int(19500))
+    #capture.set(cv2.CAP_PROP_POS_FRAMES, int(19500))
+    capture.set(cv2.CAP_PROP_POS_FRAMES, int(30))
 
     # capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(2560))
     # capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(1440))
@@ -192,8 +196,12 @@ def detection_cat(model):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--source', type=str, default='/content/drive/MyDrive/video.mp4', help='source')  # file/folder, 0 for webcam
+    opt = parser.parse_args()
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = load_model(device)
-    detection_cat(model)
+    detection_cat(model, opt.source)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
