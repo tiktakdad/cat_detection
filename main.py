@@ -26,7 +26,7 @@ def expand_box(bbox, roi_mul, shape):
     new_box = [cx - int(width / 2), cy - int(height / 2), width, height]
     return new_box
 
-def detection_cat(model, source):
+def detection_cat(model, source, dest):
     # capture the webcam
     roi_mul = 1.2
     stacked_box = []
@@ -163,7 +163,7 @@ def detection_cat(model, source):
                         stack_frame[new_box[1]:new_box[1] + new_box[3], new_box[0]:new_box[0] + new_box[2]] \
                             = origin[new_box[1]:new_box[1] + new_box[3], new_box[0]:new_box[0] + new_box[2]]
 
-                        cv2.imwrite('stack/' + str(len(stacked_box)) + '.png', stack_frame)
+                        cv2.imwrite(dest+'/' + str(len(stacked_box)) + '.png', stack_frame)
                         stack_frame_draw = stack_frame.copy()
                         for s_idx in range(len(stacked_box)):
                             sbox = list(map(int, stacked_box[s_idx]))
@@ -175,9 +175,9 @@ def detection_cat(model, source):
                             cv2.putText(stack_frame_draw, stacked_time[s_idx], (cx - 40, cy + 20), cv2.FONT_HERSHEY_SIMPLEX,
                                         0.5, (0, 255, 0), 2)
 
-                        cv2.imwrite('stack/' + str(len(stacked_box)) + '_draw' + '.png', stack_frame_draw)
+                        cv2.imwrite(dest+'/' + str(len(stacked_box)) + '_draw' + '.png', stack_frame_draw)
                         heat_map_save = draw_heatmap(heat_map, stack_frame)
-                        cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
+                        cv2.imwrite(dest+'/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
                         pbar.set_description("Add %d cats!! " % len(stacked_box))
                         #cv2.imshow("heatmap", heat_map_save)
                         # stack_frame[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]] = frame[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]]
@@ -200,7 +200,7 @@ def detection_cat(model, source):
 
     # final output
     heat_map_save = draw_heatmap(heat_map, stack_frame)
-    cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
+    cv2.imwrite(dest+'/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
     #cv2.imshow("heatmap", heat_map_save)
     capture.release()
     print('Finish Cat Day!')
@@ -208,11 +208,13 @@ def detection_cat(model, source):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--source', type=str, default='/content/drive/MyDrive/mycat/video.mp4', help='source')  # file/folder, 0 for webcam
+    parser.add_argument('--source', type=str, default='/content/drive/MyDrive/mycat/video.mp4', help='source')
+    parser.add_argument('--dest', type=str, default='/content/drive/MyDrive/mycat/',
+                        help='dest')  # file/folder, 0 for webcam
     opt = parser.parse_args()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = load_model(device)
-    detection_cat(model, opt.source)
+    detection_cat(model, opt.source, opt.dest)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
