@@ -62,9 +62,9 @@ def detection_cat(model, source):
     # Get names and colors
     is_init = True
 
-    cv2.namedWindow('cam', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('stack_frame', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('heatmap', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+    #cv2.namedWindow('cam', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+    #cv2.namedWindow('stack_frame', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+    #cv2.namedWindow('heatmap', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
 
     stack_frame = None
 
@@ -172,7 +172,7 @@ def detection_cat(model, source):
                     cv2.imwrite('stack/' + str(len(stacked_box)) + '_draw' + '.png', stack_frame_draw)
                     heat_map_save = draw_heatmap(heat_map, stack_frame)
                     cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
-                    cv2.imshow("heatmap", heat_map_save)
+                    #cv2.imshow("heatmap", heat_map_save)
                     # stack_frame[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]] = frame[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]]
                     
 
@@ -182,22 +182,22 @@ def detection_cat(model, source):
                 sbox = list(map(int, sbox))
                 cv2.rectangle(frame, sbox, (0, 255, 0), 5)
 
-            cv2.imshow('stack_frame', stack_frame)
-        cv2.imshow('cam', frame)
+            #cv2.imshow('stack_frame', stack_frame)
+        #cv2.imshow('cam', frame)
 
-        if cv2.waitKey(15) & 0xFF == ord('q'):  # to break the
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
             break
 
     # final output
     heat_map_save = draw_heatmap(heat_map, stack_frame)
     cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
-    cv2.imshow("heatmap", heat_map_save)
+    #cv2.imshow("heatmap", heat_map_save)
     capture.release()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--source', type=str, default='/content/drive/MyDrive/video.mp4', help='source')  # file/folder, 0 for webcam
+    parser.add_argument('--source', type=str, default='/content/drive/MyDrive/mycat/video.mp4', help='source')  # file/folder, 0 for webcam
     opt = parser.parse_args()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
