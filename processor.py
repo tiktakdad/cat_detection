@@ -27,7 +27,7 @@ def process_heatmap(heat_map, tracks, head_id):
             add_map = (add_map/255)/10
             #cv2.imshow("test", add_map)
             heat_map += add_map
-            print('heat_map_size:' + str(len(head_id)))
+            #print('heat_map_size:' + str(len(head_id)))
             #weighted_img = draw_heatmap(heat_map, stack_frame)
 
 def draw_heatmap(heat_map, stack_frame):
