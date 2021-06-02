@@ -71,6 +71,7 @@ def detection_cat(model, source, dest):
     stack_frame = None
 
     with tqdm(total=frame_count) as pbar:
+        pbar.set_description("Add %d cats!! " % len(stacked_box))
         while True:  # while true, read the camera
             ret, frame = capture.read()
             if not ret:
