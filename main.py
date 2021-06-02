@@ -75,12 +75,13 @@ def detection_cat(model, source):
             ret, frame = capture.read()
             if not ret:
                 break
+            pbar.update(1)
+
             origin = frame.copy()
             if stack_frame is None:
                 stack_frame = frame.copy()
 
-            pos_frame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
-            pbar.update(pos_frame)
+            #pos_frame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
 
             input = frame[:, :, ::-1]   # OpenCV image (BGR to RGB)
             # torch.stack()
@@ -177,6 +178,7 @@ def detection_cat(model, source):
                         cv2.imwrite('stack/' + str(len(stacked_box)) + '_draw' + '.png', stack_frame_draw)
                         heat_map_save = draw_heatmap(heat_map, stack_frame)
                         cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
+                        pbar.set_description("Add %d cats!! " % len(stacked_box))
                         #cv2.imshow("heatmap", heat_map_save)
                         # stack_frame[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]] = frame[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]]
 
@@ -194,6 +196,7 @@ def detection_cat(model, source):
                 break
 
     # final output
+    pbar.close()
     heat_map_save = draw_heatmap(heat_map, stack_frame)
     cv2.imwrite('stack/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
     #cv2.imshow("heatmap", heat_map_save)
