@@ -3,8 +3,7 @@ import argparse
 import torch
 import numpy as np
 import cv2
-from PIL import Image
-from IPython.display import display
+import matplotlib.pyplot as plt
 
 from tqdm.auto import tqdm
 from detector import load_model, detect_cat
@@ -24,7 +23,7 @@ def start_catday(model, source, dest, max_min):
     #capture = cv2.VideoCapture(0)
     #capture = cv2.VideoCapture('D:/Program Files/DAUM/PotPlayer/Capture/TV_CAM_장치_20210526_173127.mp4')
     #capture = cv2.VideoCapture('D:/Videos/tiki_taka/210601/[mix]TV_CAM_장치_20210601_003220.mp4')
-    if source is '0':
+    if source == '0':
         source = int(0)
     capture = cv2.VideoCapture(source)
 
@@ -93,7 +92,9 @@ def start_catday(model, source, dest, max_min):
 
                 # cv2.imshow('stack_frame', stack_frame)
             # cv2.imshow('cam', frame)
-            display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+            #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+            plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            plt.show()
 
             if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
                 break
