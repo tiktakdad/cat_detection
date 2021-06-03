@@ -16,6 +16,32 @@ def load_model(device):
 
     return model
 
+def detect_cat(model, frame, roi_mul):
+
+    input = frame[:, :, ::-1]  # OpenCV image (BGR to RGB)
+    results = model(input, size=640, augment=False)
+    bboxes = []
+    confidences = []
+    class_ids = []
+    for *box, conf, cls in results.pred[0]:  # xyxy, confidence, class
+        c1, c2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
+        # (xmin, ymin, width, height)
+        bbox = [c1[0], c1[1], c2[0] - c1[0], c2[1] - c1[1]]
+        bbox = expand_box(bbox, roi_mul, frame.shape)
+
+        # label = f'{results.names[int(cls)]} {conf:.2f}'
+        need_append_box = True
+        for candidate_box in bboxes:
+            if get_iou(candidate_box, bbox) > 0.8:
+                need_append_box = False
+                break
+
+        if need_append_box is True:
+            bboxes.append(bbox)
+            confidences.append(conf.cpu())
+            class_ids.append(cls.cpu())
+            cv2.rectangle(frame, bbox, (0, 0, 255), 3)
+    return bboxes, confidences, class_ids
 
 def get_iou(bb1, bb2):
     # determine the (x, y)-coordinates of the intersection rectangle
@@ -88,3 +114,19 @@ def transpose_img_to_input(frame, imgsz, stride, device):
     if img.ndimension() == 3:
         img = img.unsqueeze(0)
     return img
+
+
+def expand_box(bbox, roi_mul, shape):
+    cx = int(bbox[0] + bbox[2] / 2)
+    cy = int(bbox[1] + bbox[3] / 2)
+    width = int(bbox[2] * roi_mul)
+    height = int(bbox[3] * roi_mul)
+    # expand the box
+    cx = cx if cx - int(width / 2) > 0 else cx + abs(cx - int(width / 2))
+    cy = cy if cy - int(height / 2) > 0 else cy + abs(cy - int(height / 2))
+    cx = cx if cx + int(width / 2) < shape[1] else cx - abs(
+        (cx + int(width / 2)) - shape[1])
+    cy = cy if cy + int(height / 2) < shape[0] else cy - abs(
+        (cy + int(height / 2)) - shape[0])
+    new_box = [cx - int(width / 2), cy - int(height / 2), width, height]
+    return new_box
