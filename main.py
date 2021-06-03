@@ -3,7 +3,8 @@ import argparse
 import torch
 import numpy as np
 import cv2
-from matplotlib import pyplot as plt
+from PIL import Image
+from IPython.display import display
 
 from tqdm.auto import tqdm
 from detector import load_model, detect_cat
@@ -92,8 +93,7 @@ def start_catday(model, source, dest, max_min):
 
                 # cv2.imshow('stack_frame', stack_frame)
             # cv2.imshow('cam', frame)
-            plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            plt.show()
+            display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
 
             if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
                 break
