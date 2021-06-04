@@ -5,9 +5,10 @@ import numpy as np
 import cv2
 from IPython import get_ipython
 
+print(get_ipython())
 if 'google.colab' in str(get_ipython()):
-  from google.colab.patches import cv2_imshow
-
+    print('colab')
+    from google.colab.patches import cv2_imshow
 
 from tqdm.auto import tqdm
 from detector import load_model, detect_cat
