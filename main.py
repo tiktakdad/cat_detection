@@ -3,12 +3,13 @@ import argparse
 import torch
 import numpy as np
 import cv2
-from IPython import get_ipython
-
-print(get_ipython())
-if 'google.colab' in str(get_ipython()):
-    print('colab')
+try:
+    import google.colab
     from google.colab.patches import cv2_imshow
+    is_colab = True
+except:
+    is_colab = False
+print('is_colab:', is_colab)
 
 from tqdm.auto import tqdm
 from detector import load_model, detect_cat
@@ -98,7 +99,7 @@ def start_catday(model, source, dest, max_min):
                 # cv2.imshow('stack_frame', stack_frame)
             # cv2.imshow('cam', frame)
             #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-            if 'google.colab' in str(get_ipython()):
+            if is_colab is True:
                 cv2_imshow('cam', frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
