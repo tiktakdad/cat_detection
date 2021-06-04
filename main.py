@@ -100,7 +100,7 @@ def start_catday(model, source, dest, max_min):
             # cv2.imshow('cam', frame)
             #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
             if is_colab is True:
-                cv2_imshow('cam', frame)
+                cv2_imshow(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
                 break
