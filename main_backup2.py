@@ -3,12 +3,13 @@ import argparse
 import torch
 import numpy as np
 import cv2
-import os
-import matplotlib as mpl
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    mpl.use('Agg')
-import matplotlib.pyplot as plt
+try:
+    import google.colab
+    from google.colab.patches import cv2_imshow
+    is_colab = True
+except:
+    is_colab = False
+print('is_colab:', is_colab)
 
 from detector import load_model, detect_cat
 from processor import process_heatmap, process_stackmap, draw_heatmap, save_maps
@@ -93,10 +94,8 @@ def start_catday(model, source, dest, max_min):
             # cv2.imshow('stack_frame', stack_frame)
         # cv2.imshow('cam', frame)
         #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-        plt.axis("off")
-        plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        plt.show()
-
+        if is_colab is True:
+            cv2_imshow(frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
             break
