@@ -4,7 +4,7 @@ from detector import get_iou
 
 
 def save_maps(dest, stacked_box, stacked_id, stack_frame, heat_map):
-    cv2.imwrite(dest + '/' + str(len(stacked_box)) + '.png', stack_frame)
+    cv2.imwrite(dest + '/' + str(len(stacked_box)) + '_stack' + '.png', stack_frame)
     stack_frame_draw = stack_frame.copy()
     for s_idx in range(len(stacked_box)):
         sbox = list(map(int, stacked_box[s_idx]))

@@ -3,14 +3,14 @@ import cv2
 import numpy as np
 
 
-def load_model(device):
+def load_model(device, conf, iou, classes):
     # device = select_device('0')
 
     # model = attempt_load('yolov5s.pt', map_location=device)  # load FP32 model
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
-    model.conf = 0.20  # confidence threshold (0-1)
-    model.iou = 0.35  # NMS IoU threshold (0-1)
-    model.classes = [15, 16]
+    model.conf = conf  # confidence threshold (0-1)
+    model.iou = iou  # NMS IoU threshold (0-1)
+    model.classes = classes
     # model.classes = [0, 15, 16]   # (optional list) filter by class, i.e. = [0, 15, 16] for persons, cats and dogs
     model.to(device)
 
@@ -40,7 +40,7 @@ def detect_cat(model, frame, roi_mul):
             bboxes.append(bbox)
             confidences.append(conf.cpu())
             class_ids.append(cls.cpu())
-            cv2.rectangle(frame, bbox, (0, 0, 255), 3)
+            #cv2.rectangle(frame, bbox, (0, 0, 255), 3)
     return bboxes, confidences, class_ids
 
 def get_iou(bb1, bb2):

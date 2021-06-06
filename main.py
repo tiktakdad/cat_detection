@@ -67,7 +67,7 @@ def start_catday(model, source, dest, max_min):
     stack_frame = None
 
     with tqdm(total=frame_count) as pbar:
-        pbar.set_description("Add %d cats!! " % len(stacked_box))
+        pbar.set_description("Find %d cats!! " % len(stacked_box))
         while True:  # while true, read the camera
             ret, frame = capture.read()
             if not ret:
@@ -88,7 +88,7 @@ def start_catday(model, source, dest, max_min):
             process_heatmap(heat_map, tracks, head_id)
             # save map files
             if flag_file_save:
-                pbar.set_description("Add %d cats!! " % len(stacked_box))
+                pbar.set_description("Find %d cats!! " % len(stacked_box))
                 save_maps(dest, stacked_box, stacked_id, stack_frame, heat_map)
             # draw tracks
             draw_tracks(frame, tracks)
@@ -113,6 +113,11 @@ def start_catday(model, source, dest, max_min):
     # final output
     capture.release()
     print('Finish Cat Day!')
+    cv2.imwrite(dest + '/' + 'final' + '_stack' + '.png', stack_frame)
+    if is_colab is False:
+        cv2.rectangle(frame, sbox, (0, 255, 0), 5)
+        cv2.imshow('stack_frame', stack_frame)
+    cv2.waitKey(0)
 
 
 if __name__ == '__main__':
@@ -123,5 +128,5 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = load_model(device)
+    model = load_model(device, 0.20, 0.35, [15, 16])
     start_catday(model, opt.source, opt.dest, opt.max_minute)
