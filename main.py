@@ -3,13 +3,15 @@ import argparse
 import torch
 import numpy as np
 import cv2
-import os
-import matplotlib as mpl
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    mpl.use('Agg')
-import matplotlib.pyplot as plt
+try:
+    import google.colab
+    from google.colab.patches import cv2_imshow
+    is_colab = True
+except:
+    is_colab = False
+print('is_colab:', is_colab)
 
+from tqdm.auto import tqdm
 from detector import load_model, detect_cat
 from processor import process_heatmap, process_stackmap, draw_heatmap, save_maps
 from motrackers import IOUTracker
@@ -63,47 +65,52 @@ def start_catday(model, source, dest, max_min):
 
     stack_frame = None
 
-    while True:  # while true, read the camera
-        ret, frame = capture.read()
-        if not ret:
-            break
+    with tqdm(total=frame_count) as pbar:
+        pbar.set_description("Add %d cats!! " % len(stacked_box))
+        while True:  # while true, read the camera
+            ret, frame = capture.read()
+            if not ret:
+                break
+            pbar.update(skip_frame + 1)
 
-        origin_frame = frame.copy()
-        if stack_frame is None:
-            stack_frame = frame.copy()
+            origin_frame = frame.copy()
+            if stack_frame is None:
+                stack_frame = frame.copy()
 
-        # detection cats
-        bboxes, confidences, class_ids = detect_cat(model, frame, roi_mul)
-        # track cats
-        tracks = tracker.update(bboxes, confidences, class_ids)
-        # process stack map
-        flag_file_save = process_stackmap(tracks, stacked_box, stacked_id, stack_frame, origin_frame)
-        # process heat map
-        process_heatmap(heat_map, tracks, head_id)
-        # save map files
-        if flag_file_save:
-            save_maps(dest, stacked_box, stacked_id, stack_frame, heat_map)
-        # draw tracks
-        draw_tracks(frame, tracks)
-        # draw stacked box
-        for sbox in stacked_box:
-            sbox = list(map(int, sbox))
-            cv2.rectangle(frame, sbox, (0, 255, 0), 5)
+            # detection cats
+            bboxes, confidences, class_ids = detect_cat(model, frame, roi_mul)
+            # track cats
+            tracks = tracker.update(bboxes, confidences, class_ids)
+            # process stack map
+            flag_file_save = process_stackmap(tracks, stacked_box, stacked_id, stack_frame, origin_frame)
+            # process heat map
+            process_heatmap(heat_map, tracks, head_id)
+            # save map files
+            if flag_file_save:
+                pbar.set_description("Add %d cats!! " % len(stacked_box))
+                save_maps(dest, stacked_box, stacked_id, stack_frame, heat_map)
+            # draw tracks
+            draw_tracks(frame, tracks)
+            # draw stacked box
+            for sbox in stacked_box:
+                sbox = list(map(int, sbox))
+                cv2.rectangle(frame, sbox, (0, 255, 0), 5)
 
-            # cv2.imshow('stack_frame', stack_frame)
-        # cv2.imshow('cam', frame)
-        #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-        plt.axis("off")
-        plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        plt.show()
+                # cv2.imshow('stack_frame', stack_frame)
+            # cv2.imshow('cam', frame)
+            #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+            if is_colab is True:
+                cv2_imshow(frame)
 
+            if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
+                break
+            if skip_frame > 0:
+                now_frame_pos = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                capture.set(cv2.CAP_PROP_POS_FRAMES, int(now_frame_pos + skip_frame))
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
-            break
-        if skip_frame > 0:
-            now_frame_pos = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
-            capture.set(cv2.CAP_PROP_POS_FRAMES, int(now_frame_pos + skip_frame))
-
+        # end of video
+        pbar.update(frame_count - pbar.n)
+        pbar.close()
 
     # final output
     heat_map_save = draw_heatmap(heat_map, stack_frame)
