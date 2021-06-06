@@ -10,7 +10,7 @@ try:
 
     os.system("Xvfb :1 -screen 0 1024x768x24 &")
     os.environ['DISPLAY'] = ':1'
-    from Tkinter import *
+    from tkinter import *
     from google.colab.patches import cv2_imshow
     from google.colab import output
     from PIL import Image
