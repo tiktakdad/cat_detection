@@ -3,17 +3,10 @@ import argparse
 import torch
 import numpy as np
 import cv2
+
 try:
     import google.colab
-    from google.colab.patches import cv2_imshow
-    import os
 
-    os.system("Xvfb :1 -screen 0 1024x768x24 &")
-    os.environ['DISPLAY'] = ':1'
-    from tkinter import *
-    from google.colab.patches import cv2_imshow
-    from google.colab import output
-    from PIL import Image
     is_colab = True
 except:
     is_colab = False
@@ -34,9 +27,9 @@ def start_catday(model, source, dest, max_min):
     stacked_id = []
     head_id = {}
 
-    #capture = cv2.VideoCapture(0)
-    #capture = cv2.VideoCapture('D:/Program Files/DAUM/PotPlayer/Capture/TV_CAM_장치_20210526_173127.mp4')
-    #capture = cv2.VideoCapture('D:/Videos/tiki_taka/210601/[mix]TV_CAM_장치_20210601_003220.mp4')
+    # capture = cv2.VideoCapture(0)
+    # capture = cv2.VideoCapture('D:/Program Files/DAUM/PotPlayer/Capture/TV_CAM_장치_20210526_173127.mp4')
+    # capture = cv2.VideoCapture('D:/Videos/tiki_taka/210601/[mix]TV_CAM_장치_20210601_003220.mp4')
     if source == '0':
         source = int(0)
     capture = cv2.VideoCapture(source)
@@ -66,10 +59,10 @@ def start_catday(model, source, dest, max_min):
     tracker = IOUTracker(max_lost=15, iou_threshold=0.5, min_detection_confidence=0.4,
                          max_detection_confidence=0.7,
                          tracker_output_format='mot_challenge')
-
-    #cv2.namedWindow('cam', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-    #cv2.namedWindow('stack_frame', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-    #cv2.namedWindow('heatmap', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+    if is_colab is False:
+        cv2.namedWindow('cam', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+        cv2.namedWindow('stack_frame', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+        #cv2.namedWindow('heatmap', cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
 
     stack_frame = None
 
@@ -100,18 +93,15 @@ def start_catday(model, source, dest, max_min):
             # draw tracks
             draw_tracks(frame, tracks)
             # draw stacked box
-            for sbox in stacked_box:
-                sbox = list(map(int, sbox))
-                cv2.rectangle(frame, sbox, (0, 255, 0), 5)
+            if is_colab is False:
+                for sbox in stacked_box:
+                    sbox = list(map(int, sbox))
+                    cv2.rectangle(frame, sbox, (0, 255, 0), 5)
+                    cv2.imshow('stack_frame', stack_frame)
+                cv2.imshow('cam', frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
+                    break
 
-                # cv2.imshow('stack_frame', stack_frame)
-            #cv2.imshow('cam', frame)
-            #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-            if is_colab is True:
-                cv2_imshow(frame)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):  # to break the
-                break
             if skip_frame > 0:
                 now_frame_pos = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
                 capture.set(cv2.CAP_PROP_POS_FRAMES, int(now_frame_pos + skip_frame))
@@ -121,9 +111,6 @@ def start_catday(model, source, dest, max_min):
         pbar.close()
 
     # final output
-    heat_map_save = draw_heatmap(heat_map, stack_frame)
-    cv2.imwrite(dest + '/' + str(len(stacked_box)) + '_heat' + '.png', heat_map_save)
-    #cv2.imshow("heatmap", heat_map_save)
     capture.release()
     print('Finish Cat Day!')
 
