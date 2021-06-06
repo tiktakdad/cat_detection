@@ -70,7 +70,7 @@ def main():
     tfile = tempfile.NamedTemporaryFile(delete=True)
 
     upload.empty()
-    vf = cv2.VideoCapture('D:/Videos/tiki_taka/210601/[mix]TV_CAM_장치_20210601_003220.mp4')
+    vf = cv2.VideoCapture('/content/drive/MyDrive/mycat/video.mp4')
     ProcessFrames(vf, stop_button)
 
 
