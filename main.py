@@ -97,7 +97,7 @@ def start_catday(model, source, dest, max_min):
                 cv2.rectangle(frame, sbox, (0, 255, 0), 5)
 
                 # cv2.imshow('stack_frame', stack_frame)
-            # cv2.imshow('cam', frame)
+            cv2.imshow('cam', frame)
             #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
             if is_colab is True:
                 cv2_imshow(frame)
