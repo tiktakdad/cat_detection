@@ -6,6 +6,14 @@ import cv2
 try:
     import google.colab
     from google.colab.patches import cv2_imshow
+    import os
+
+    os.system("Xvfb :1 -screen 0 1024x768x24 &")
+    os.environ['DISPLAY'] = ':1'
+    from Tkinter import *
+    from google.colab.patches import cv2_imshow
+    from google.colab import output
+    from PIL import Image
     is_colab = True
 except:
     is_colab = False
@@ -97,7 +105,7 @@ def start_catday(model, source, dest, max_min):
                 cv2.rectangle(frame, sbox, (0, 255, 0), 5)
 
                 # cv2.imshow('stack_frame', stack_frame)
-            cv2.imshow('cam', frame)
+            #cv2.imshow('cam', frame)
             #display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
             if is_colab is True:
                 cv2_imshow(frame)
