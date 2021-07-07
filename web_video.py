@@ -1,7 +1,6 @@
 import gradio as gr
 import torch
 import cv2
-from PIL import Image
 
 # Images
 torch.hub.download_url_to_file('https://github.com/ultralytics/yolov5/raw/master/data/images/zidane.jpg', 'zidane.jpg')
